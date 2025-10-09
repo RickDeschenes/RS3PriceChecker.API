@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32602.215
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RS3PriceChecker.API", "RS3PriceChecker.API\RS3PriceChecker.API.csproj", "{D43628B7-D717-4494-BF8B-3B2D7416879B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RS3PriceChecker.Models", "RS3PriceChecker.Models\RS3PriceChecker.Models.csproj", "{6BDBEA9E-162E-4F6D-901E-364EFDE6A703}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RS3PriceChecker.Repository", "RS3PriceChecker.Repository\RS3PriceChecker.Repository.csproj", "{26BB9D38-B354-420A-8D0F-8F4F059B9375}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RS3PriceChecker.Database", "RS3PriceChecker.Database\RS3PriceChecker.Database.csproj", "{AF9644F9-1448-41DF-8797-3C381AC6F03B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RS3PriceChecker.Services", "RS3PriceChecker.Services\RS3PriceChecker.Services.csproj", "{E8350441-3DB9-49A8-BCB3-4C72BA2D31C8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D43628B7-D717-4494-BF8B-3B2D7416879B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D43628B7-D717-4494-BF8B-3B2D7416879B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D43628B7-D717-4494-BF8B-3B2D7416879B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D43628B7-D717-4494-BF8B-3B2D7416879B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6BDBEA9E-162E-4F6D-901E-364EFDE6A703}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6BDBEA9E-162E-4F6D-901E-364EFDE6A703}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6BDBEA9E-162E-4F6D-901E-364EFDE6A703}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6BDBEA9E-162E-4F6D-901E-364EFDE6A703}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26BB9D38-B354-420A-8D0F-8F4F059B9375}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26BB9D38-B354-420A-8D0F-8F4F059B9375}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26BB9D38-B354-420A-8D0F-8F4F059B9375}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26BB9D38-B354-420A-8D0F-8F4F059B9375}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF9644F9-1448-41DF-8797-3C381AC6F03B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF9644F9-1448-41DF-8797-3C381AC6F03B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF9644F9-1448-41DF-8797-3C381AC6F03B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF9644F9-1448-41DF-8797-3C381AC6F03B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E8350441-3DB9-49A8-BCB3-4C72BA2D31C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8350441-3DB9-49A8-BCB3-4C72BA2D31C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E8350441-3DB9-49A8-BCB3-4C72BA2D31C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E8350441-3DB9-49A8-BCB3-4C72BA2D31C8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {41B9CCAE-B0BF-49FE-A041-E546E53FF7E4}
+	EndGlobalSection
+EndGlobal

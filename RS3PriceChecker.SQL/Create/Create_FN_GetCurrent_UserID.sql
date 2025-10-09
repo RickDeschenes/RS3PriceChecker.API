@@ -1,0 +1,17 @@
+﻿USE [RS3PriceChecker]
+GO
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+CREATE FUNCTION [dbo].[fn_GetCurrentUserID]
+()
+RETURNS NVARCHAR(256)
+AS
+BEGIN
+	RETURN UPPER(SUBSTRING(System_User, CHARINDEX('\', System_User, 0) + 1, LEN(System_User) - CHARINDEX('\', System_user, 0) + 1))
+END
+GO
