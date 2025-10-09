@@ -14,6 +14,8 @@ RS3PriceChecker is a .NET 6 solution for retrieving and displaying RuneScape 3 G
 - `RS3PriceChecker.API`: ASP.NET Core Web API exposing endpoints for price and item queries.
 - `RS3PriceChecker.Services`: Business logic for interacting with the Grand Exchange and item details.
 - `RS3PriceChecker.Repository`: Data access layer for item information.
+- `RS3PriceChecker.Models`: DTO layer not using IMapper.
+- `RS3PriceChecker.Database`: Database access layer.
 
 ## Getting Started
 
