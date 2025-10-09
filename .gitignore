@@ -44,7 +44,7 @@ Generated\ Files/
 # MSTest test Results
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
-MSBuild_Logs/
+/MSBuild_Logs/
 
 # NUnit
 *.VisualState.xml
@@ -362,6 +362,3 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-/MSBuild_Logs/MSBuild_CommTrace_PID_23344.txt
-/MSBuild_Logs/MSBuild_CommTrace_PID_29360.txt
-/MSBuild_Logs/MSBuild_CommTrace_PID_4628.txt
