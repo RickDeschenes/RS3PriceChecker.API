@@ -11,5 +11,5 @@ public class ItemDetail
     public string SmallIcon { get; set; } = string.Empty;
     public string LargeIcon { get; set; } = string.Empty;
     public DateTime Date { get; set; }
-    public List<Prices> Prices { get; set; } = [];
+    public List<Price> Prices { get; set; } = [];
 }

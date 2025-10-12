@@ -4,10 +4,10 @@ using System.Text;
 
 namespace RS3PriceChecker.Services
 {
-    public class ItemDetailService : IItemDetailService, IDisposable
+    public class ItemDetailService
     {
-        private readonly IItemDetailRepository _ItemDetailRepository;
-        private bool disposedValue;
+        private readonly ItemDetailRepository _ItemDetailRepository;
+
         private string StatusMessage { get; set; }
         private int StatusCode { get; set; }
         private int LongSleep { get; set; }
@@ -15,7 +15,7 @@ namespace RS3PriceChecker.Services
 
         private GrandExchangeService GrandExchange { get; set; }
 
-        public ItemDetailService(IItemDetailRepository itemDetailRepository)
+        public ItemDetailService(ItemDetailRepository itemDetailRepository)
         {
             _ItemDetailRepository = itemDetailRepository;
             StatusMessage = "Calls to fast";
@@ -38,7 +38,7 @@ namespace RS3PriceChecker.Services
                 dbdate = ltdate;
 
             var items = _ItemDetailRepository.GetRecentPrices().ToList();
-            items = items.Where(w => w.Date < dbdate).ToList();
+            items = [.. items.Where(w => w.Date < dbdate)];
 
             GrandExchange = new();
 
@@ -48,13 +48,13 @@ namespace RS3PriceChecker.Services
                 var item = items[i];
                 var p = _ItemDetailRepository.GetAllPricesByItemID(item.IID).OrderByDescending(d => d.Date).FirstOrDefault();
                 //If we have prices
-                if (p != null && p.ID > 0)
+                if (p != null && p.Id> 0)
                 {
                     //and they are older then one day
                     if (p.Date < dbdate)
                     {
                         // Load the prices
-                        sb.AppendLine(UpdatePrices(item.ItemID, p, p.Date));
+                        sb.AppendLine(UpdatePrices(item.ItemId, p, p.Date));
                     }
                 }
             }
@@ -84,7 +84,7 @@ namespace RS3PriceChecker.Services
                     {
                         Amount = val.Price,
                         Date = val.Date,
-                        ItemID = prices.ItemID,
+                        ItemId = prices.ItemId,
                         CreatedBy = creator,
                         CreatedDate = created,
                         ModifiedBy = creator,
@@ -181,7 +181,7 @@ namespace RS3PriceChecker.Services
             {
                 var item = items[i];
 
-                string file = Path.Combine(fullpath, item.ItemID.ToString());
+                string file = Path.Combine(fullpath, item.ItemId.ToString());
                 string extension = ".json";
 
                 string daily = "{\"daily";
@@ -189,13 +189,13 @@ namespace RS3PriceChecker.Services
                 if (!File.Exists(file + extension))
                 {
                     Thread.Sleep(random.Next(3600));
-                    string data = GrandExchange.GetPrices(item.ItemID);
+                    string data = GrandExchange.GetPrices(item.ItemId);
 
                     //One extra try
                     while (!data.StartsWith(daily))
                     {
                         Thread.Sleep(3600);
-                        data = GrandExchange.GetPrices(item.ItemID);
+                        data = GrandExchange.GetPrices(item.ItemId);
                         occurence++;
                         if (!data.StartsWith(daily) && occurence >= 5)
                         {
@@ -214,7 +214,7 @@ namespace RS3PriceChecker.Services
                     else
                         file += "_error" + extension;
 
-                    data = data.Replace(daily, "{\r\n  \"ItemID\": " + item.ItemID.ToString() + ",\r\n  \"daily");
+                    data = data.Replace(daily, "{\r\n  \"ItemID\": " + item.ItemId.ToString() + ",\r\n  \"daily");
                     File.WriteAllText(file, data);
                 }
             }
@@ -262,33 +262,5 @@ namespace RS3PriceChecker.Services
             return _ItemDetailRepository.UpdateItemDetail(request);
         }
 
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    // TODO: dispose managed state (managed objects)
-                }
-
-                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
-                // TODO: set large fields to null
-                disposedValue = true;
-            }
-        }
-
-        // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
-        // ~ItemDetailService()
-        // {
-        //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        //     Dispose(disposing: false);
-        // }
-
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
-        }
     }
 }

@@ -13,14 +13,14 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Add DbContext with connection string from appsettings.json
-builder.Services.AddDbContext<RS3PriceCheckerDBContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("RS3PriceCheckerAlias")));
+builder.Services.AddDbContext<RS3DbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("Rs3DbContext")));
 
-builder.Services.AddTransient<IItemDetailRepository, ItemDetailRepository>();
+builder.Services.AddTransient<ItemDetailRepository, ItemDetailRepository>();
 
-builder.Services.AddScoped<IGrandExchangeService, GrandExchangeService>();
-builder.Services.AddTransient<IItemDetailService, ItemDetailService>();
-builder.Services.AddTransient<ILoadDataService, LoadDataService>();
+builder.Services.AddScoped<GrandExchangeService, GrandExchangeService>();
+builder.Services.AddTransient<ItemDetailService, ItemDetailService>();
+builder.Services.AddTransient<LoadDataService, LoadDataService>();
 
 var app = builder.Build();
 

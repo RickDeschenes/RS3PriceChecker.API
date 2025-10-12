@@ -16,9 +16,9 @@ public class ItemDetailController : ControllerBase
 {
     private readonly ILogger<ItemDetailController> _logger;
 
-    private readonly IItemDetailService _ItemDetailService;
+    private readonly ItemDetailService _ItemDetailService;
 
-    public ItemDetailController(IItemDetailService itemDetailService, ILogger<ItemDetailController> logger)
+    public ItemDetailController(ItemDetailService itemDetailService, ILogger<ItemDetailController> logger)
     {
         _logger = logger;
         _ItemDetailService = itemDetailService;

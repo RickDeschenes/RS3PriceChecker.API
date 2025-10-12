@@ -17,10 +17,10 @@ namespace RS3PriceChecker.API.Controllers
         private readonly IConfiguration _config;
         private readonly ILogger<LoadDataController> _logger;
 
-        private readonly ILoadDataService _LoadDataService;
+        private readonly LoadDataService _LoadDataService;
         private readonly IServiceProvider ServiceProvider;
 
-        public LoadDataController(IConfiguration config, ILogger<LoadDataController> logger, ILoadDataService loadDataService, IServiceProvider serviceProvider) //, IItemDetailRepository item, RS3PriceCheckerDBContext context)
+        public LoadDataController(IConfiguration config, ILogger<LoadDataController> logger, LoadDataService loadDataService, IServiceProvider serviceProvider) //, IItemDetailRepository item, RS3PriceCheckerDBContext context)
         {
             _config = config;
             _logger = logger;
@@ -63,13 +63,12 @@ namespace RS3PriceChecker.API.Controllers
         {
             _logger.LogInformation("Processing LoadItemFilesAsync");
             await using var scope = ServiceProvider.CreateAsyncScope();
-            var scopedService = scope.ServiceProvider.GetRequiredService<ILoadDataService>();
+            var scopedService = scope.ServiceProvider.GetRequiredService<LoadDataService>();
             await Task.Run(() => scopedService.LoadItemFiles(path));
             _logger.LogInformation("Processed LoadItemFilesAsyncv");
         }
 
         #endregion
-
 
     }
 

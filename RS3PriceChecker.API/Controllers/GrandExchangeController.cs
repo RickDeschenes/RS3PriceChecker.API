@@ -13,9 +13,9 @@ namespace RS3PriceChecker.API.Controllers
     public class GrandExchangeController : ControllerBase
     {
         private readonly ILogger<GrandExchangeController> _logger;
-        private readonly IGrandExchangeService _GrandExchangeService;
+        private readonly GrandExchangeService _GrandExchangeService;
 
-        public GrandExchangeController(ILogger<GrandExchangeController> logger, IGrandExchangeService grandExchangeService)
+        public GrandExchangeController(ILogger<GrandExchangeController> logger, GrandExchangeService grandExchangeService)
         {
             _logger = logger;
             _GrandExchangeService = grandExchangeService;

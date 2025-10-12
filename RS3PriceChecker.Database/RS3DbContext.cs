@@ -1,29 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
+﻿
 using Microsoft.EntityFrameworkCore;
 
 namespace RS3PriceChecker.Database;
 
-public partial class RS3PriceCheckerDBContext : DbContext
+public partial class RS3DbContext : DbContext
 {
-    public RS3PriceCheckerDBContext()
+    public RS3DbContext()
     {
     }
 
-    public RS3PriceCheckerDBContext(DbContextOptions<RS3PriceCheckerDBContext> options)
+    public RS3DbContext(DbContextOptions<RS3DbContext> options)
         : base(options)
     {
     }
 
-    public virtual DbSet<Category> Categories { get; set; }
+    public virtual DbSet<Category> Category { get; set; }
 
-    public virtual DbSet<Icon> Icons { get; set; }
-
-    public virtual DbSet<Item> Items { get; set; }
-
-    public virtual DbSet<Name> Names { get; set; }
-
-    public virtual DbSet<Price> Prices { get; set; }
+    public virtual DbSet<Icon> Icon { get; set; }
+    public virtual DbSet<Item> Item { get; set; }
+    public virtual DbSet<Name> Name { get; set; }
+    public virtual DbSet<Price> Price { get; set; }
+    public virtual DbSet<MostRecentPrice> MostRecentPrice { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

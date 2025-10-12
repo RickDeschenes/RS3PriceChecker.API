@@ -12,7 +12,7 @@ using System.Threading;
 
 namespace RS3PriceChecker.Services
 {
-    public class LoadDataService : ILoadDataService
+    public class LoadDataService
     {
         private bool Delete { get; set; }
         private string StatusMessage { get; set; }
@@ -27,19 +27,23 @@ namespace RS3PriceChecker.Services
 
         private readonly string[] Categories = { "Miscellaneous", "Ammo", "Arrows", "Bolts", "Construction materials", "Construction products", "Cooking ingredients", "Costumes", "Crafting materials", "Familiars", "Farming produce", "Fletching materials", "Food and Drink", "Herblore materials", "Hunting equipment", "Hunting Produce", "Jewellery", "Mage armour", "Mage weapons", "Melee armour - low level", "Melee armour - mid level", "Melee armour - high level", "Melee weapons - low level", "Melee weapons - mid level", "Melee weapons - high level", "Mining and Smithing", "Potions", "Prayer armour", "Prayer materials", "Range armour", "Range weapons", "Runecrafting", "Runes, Spells and Teleports", "Seeds", "Summoning scrolls", "Tools and containers", "Woodcutting product", "Pocket items", "Stone spirits", "Salvage", "Firemaking products", "Archaeology materials" };
 
-
+        private GrandExchangeService _exchangeService { get; set; }
         private readonly ILogger<LoadDataService> _logger;
-        private readonly IItemDetailRepository _ItemDetailRepository;
+        private readonly ItemDetailRepository _ItemDetailRepository;
+        private readonly ItemDetailService _itemDetailService;
 
         /// <summary>
         /// LoadDataService
         /// </summary>
         /// <param name="logger"></param>
         /// <param name="itemDetailRepository"></param>
-        public LoadDataService(ILogger<LoadDataService> logger, IItemDetailRepository itemDetailRepository)
+        public LoadDataService(ILogger<LoadDataService> logger, ItemDetailService itemDetailService, ItemDetailRepository itemDetailRepository, GrandExchangeService exchangeService)
         {
             _logger = logger;
+            _itemDetailService = itemDetailService;
             _ItemDetailRepository = itemDetailRepository;
+            _exchangeService = exchangeService;
+
             StatusMessage = "Calls to fast";
             StatusCode = Iterations;
             Iterations = 5;
@@ -54,7 +58,6 @@ namespace RS3PriceChecker.Services
 
         public string GetPrices(List<int> items)
         {
-            using GrandExchangeService gs = new();
             var results = new StringBuilder();
             foreach (int i in items)
             {
@@ -63,7 +66,7 @@ namespace RS3PriceChecker.Services
                     Id = i,
                     Price = new()
                 };
-                var vals = LoadPrice(i, gs).ToList();
+                var vals = LoadPrice(i, _exchangeService).ToList();
                 item.Price = vals.Where(x => x.Date == DateTime.Today || x.Date == DateTime.Today.AddDays(-1)).First().Price;
                 var result = JsonSerializer.Serialize(item, Options);
 
@@ -94,10 +97,9 @@ namespace RS3PriceChecker.Services
 
             OutputPath = CreateDirectory(OutputPath);
 
-            using var gs = new GrandExchangeService();
             for (int i = 0; i < 42; i++)
             {
-                LoadFilters(gs, i);
+                LoadFilters(_exchangeService, i);
             }
 
             watch.Stop();
@@ -112,7 +114,7 @@ namespace RS3PriceChecker.Services
         {
             string catalog = Categories[category];
             string extention = ".json";
-            string raw = String.Empty;
+            string raw = string.Empty;
             int attempts = 1;
 
             while (raw == String.Empty)
@@ -149,7 +151,7 @@ namespace RS3PriceChecker.Services
                 //If the file does not exist, process it
                 if (!System.IO.File.Exists(path))
                 {
-                    LoadItems(gs, category, item.Letter, item.Items);
+                    LoadItems(_exchangeService, category, item.Letter, item.Items);
                     var output = JsonSerializer.Serialize(Items, Options );
 
                     System.IO.File.WriteAllText(path, output);
@@ -245,20 +247,18 @@ namespace RS3PriceChecker.Services
 
         private void LoadPrices(int catagory)
         {
-            using GrandExchangeService gs = new();
-            
             foreach (var item in Items)
             {
                 int attempts = 1;
                 Thread.Sleep(SleepSeconds);
 
-                var vals = LoadPrice(item.Id, gs);
+                var vals = LoadPrice(item.Id, _exchangeService);
                 attempts = 1;
                 while (vals == null || vals.Count <= 0)
                 {
                     _logger.LogWarning("No Data Returned Catagory:Current {Catagory}:{Current}::{attempts}.", catagory, Current, attempts);
                     Thread.Sleep(SleepSeconds);
-                    vals = LoadPrice(item.Id, gs);
+                    vals = LoadPrice(item.Id, _exchangeService);
                     attempts += 1;
                     if (attempts >= 5 && (vals == null || vals.Count <= 0))
                     {
@@ -321,24 +321,21 @@ namespace RS3PriceChecker.Services
 
             var list = Directory.GetFiles(path, filter, SearchOption.AllDirectories);
 
-            using (ItemDetailService ids = new(_ItemDetailRepository))
+            foreach (var item in list)
             {
-                foreach (var item in list)
-                {
-                    string data = System.IO.File.ReadAllText(item);
-                    var items = JsonSerializer.Deserialize<List<RSItem>>(data, Options);
-                    ProcessItems(items, ids);
-                    string name = Path.GetFileName(item);
-                    string processed = Path.GetDirectoryName(item);
-                    processed = Path.Combine(processed, "Processed");
+                string data = System.IO.File.ReadAllText(item);
+                var items = JsonSerializer.Deserialize<List<RSItem>>(data, Options);
+                ProcessItems(items, _itemDetailService);
+                string name = Path.GetFileName(item);
+                string processed = Path.GetDirectoryName(item);
+                processed = Path.Combine(processed, "Processed");
 
-                    if (!Directory.Exists(processed))
-                        Directory.CreateDirectory(processed);
+                if (!Directory.Exists(processed))
+                    Directory.CreateDirectory(processed);
 
-                    string fullname = Path.Combine(processed, name);
+                string fullname = Path.Combine(processed, name);
 
-                    File.Move(item, fullname);
-                }
+                File.Move(item, fullname);
             }
             //log results
             _logger.LogInformation("{results}", results);
@@ -360,7 +357,7 @@ namespace RS3PriceChecker.Services
             {
                 Catagory = item.Type,
                 Date = item.Date,
-                ItemID = item.Id,
+                ItemId = item.Id,
                 LargeIcon = item.Icon_Large,
                 SmallIcon = item.Icon,
                 Name = item.Name,

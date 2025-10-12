@@ -33,11 +33,13 @@ public class RSItem
     public string Members { get; set; } = string.Empty;
     public List<RSPrice> Prices { get; set; } = [];
 }
+
 public class RSPrice
 {
     public int Price { get; set; }
     public DateTime Date { get; set; }
 }
+
 public class RawPrice
 {
     public int Id { get; set; }
