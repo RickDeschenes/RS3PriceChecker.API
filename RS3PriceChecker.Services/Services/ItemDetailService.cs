@@ -1,13 +1,6 @@
 ﻿using RS3PriceChecker.Models;
-using RS3PriceChecker.Entities;
 using RS3PriceChecker.Repository;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace RS3PriceChecker.Services
 {
@@ -137,7 +130,7 @@ namespace RS3PriceChecker.Services
 
         private static List<RSPrice> LoadPrices(string prices)
         {
-            List<RSPrice> results = new();
+            List<RSPrice> results = [];
 
             prices = prices.Replace("{\r\n  \"daily\": {\r\n    \"", "");
             prices = prices[..prices.IndexOf("},\r\n  \"average\"")].Replace("\r\n    \"", "").Replace("\": ", ":");
@@ -253,17 +246,17 @@ namespace RS3PriceChecker.Services
 
         #endregion Load Prices
 
-        public ItemDetail GetItemDetail(int item)
+        public ItemDetails GetItemDetail(int item)
         {
             return _ItemDetailRepository.GetItemDetail(item);
         }
 
-        public ItemDetail CreateItemDetail(ItemDetail request)
+        public ItemDetails CreateItemDetail(ItemDetails request)
         {
             return _ItemDetailRepository.CreateItemDetail(request);
         }
 
-        public ItemDetail UpdateItemDetail(ItemDetail request)
+        public ItemDetails UpdateItemDetail(ItemDetails request)
         {
 
             return _ItemDetailRepository.UpdateItemDetail(request);

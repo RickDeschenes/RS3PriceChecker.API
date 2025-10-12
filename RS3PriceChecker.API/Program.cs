@@ -11,14 +11,10 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Add DbContext with connection string from appsettings.json
 builder.Services.AddDbContext<RS3PriceCheckerDBContext>(options =>
-{
-    options.UseSqlServer("name=ConnectionStrings:RS3PriceCheckerAlias");
-    //options.UseSqlServer("name=ConnectionStrings:RS3PriceCheckerAlias",
-    //    sqlServerOptionsAction: sqlOptions => {
-    //        sqlOptions.EnableRetryOnFailure();
-    //    });
-});
+    options.UseSqlServer(builder.Configuration.GetConnectionString("RS3PriceCheckerAlias")));
 
 builder.Services.AddTransient<IItemDetailRepository, ItemDetailRepository>();
 

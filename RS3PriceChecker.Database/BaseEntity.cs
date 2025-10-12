@@ -1,11 +1,12 @@
-﻿
-namespace RS3PriceChecker.Models;
+﻿using System;
 
-public abstract class BaseModel
+namespace RS3PriceChecker.Database;
+
+public abstract class BaseEntity
 {
     public int ID { get; set; }
     public DateTime CreatedDate { get; set; }
     public string CreatedBy { get; set; } = string.Empty;
     public DateTime ModifiedDate { get; set; }
-    public string ModifiedBy { get; set; } = String.Empty;
+    public string ModifiedBy { get; set; } = string.Empty;
 }

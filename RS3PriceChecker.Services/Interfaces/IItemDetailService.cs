@@ -1,4 +1,4 @@
-﻿using RS3PriceChecker.Entities;
+﻿using RS3PriceChecker.Models;
 using System;
 
 namespace RS3PriceChecker.Services
@@ -9,10 +9,10 @@ namespace RS3PriceChecker.Services
 
         void LoadGEPrices(string path);
 
-        ItemDetail GetItemDetail(int item);
+        ItemDetails GetItemDetail(int item);
 
-        ItemDetail CreateItemDetail(ItemDetail request);
+        ItemDetails CreateItemDetail(ItemDetails request);
 
-        ItemDetail UpdateItemDetail(ItemDetail request);
+        ItemDetails UpdateItemDetail(ItemDetails request);
     }
 }

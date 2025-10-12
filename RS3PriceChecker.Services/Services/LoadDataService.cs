@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using RS3PriceChecker.Database;
-using RS3PriceChecker.Entities;
+using Ety = RS3PriceChecker.Database;
 using RS3PriceChecker.Models;
 using RS3PriceChecker.Repository;
 using System;
@@ -48,7 +47,7 @@ namespace RS3PriceChecker.Services
             Current = 0;
             OutputPath = @"C:\Output\";
 
-            Items = new();
+            Items = [];
         }
 
         #region Get Items
@@ -81,7 +80,7 @@ namespace RS3PriceChecker.Services
         {
             _logger.LogInformation("Main Call to update Items.");
 
-            Items = new List<RSItem>();
+            Items = [];
 
             OutputPath = outputPath;
             _logger.LogInformation("{data}", LoadData());
@@ -145,7 +144,7 @@ namespace RS3PriceChecker.Services
                     catch (Exception ex) { _logger.LogError(ex, "{message}.", ex.Message); }
 
                 //reset the items list
-                Items = new List<RSItem>();
+                Items = [];
 
                 //If the file does not exist, process it
                 if (!System.IO.File.Exists(path))
@@ -278,7 +277,7 @@ namespace RS3PriceChecker.Services
 
         private static List<RSPrice> LoadPrice(int id, GrandExchangeService gs)
         {
-            List<RSPrice> results = new();
+            List<RSPrice> results = [];
 
             string vals = gs.GetPrices(id);
             if (vals == "null" || string.IsNullOrEmpty(vals))
@@ -355,9 +354,9 @@ namespace RS3PriceChecker.Services
 
         private static void ProcessItem(RSItem item, ItemDetailService ids)
         {
-            List<PriceEntity> prices = LoadPrices(item.Prices);
+            List<Prices> prices = LoadPrices(item.Prices);
 
-            ids.CreateItemDetail(new ItemDetail()
+            ids.CreateItemDetail(new ItemDetails()
             {
                 Catagory = item.Type,
                 Date = item.Date,
@@ -370,13 +369,13 @@ namespace RS3PriceChecker.Services
             });
         }
 
-        private static List<PriceEntity> LoadPrices(List<RSPrice> prices)
+        private static List<Prices> LoadPrices(List<RSPrice> prices)
         {
-            List<PriceEntity> results = new();
+            List<Prices> results = [];
 
             foreach (var item in prices)
             {
-                results.Add(new PriceEntity()
+                results.Add(new Prices()
                 {
                     Amount = item.Price,
                     Date = item.Date

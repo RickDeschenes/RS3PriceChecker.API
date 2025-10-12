@@ -1,6 +1,4 @@
 ﻿using RS3PriceChecker.Models;
-using RS3PriceChecker.Entities;
-using System.Collections.Generic;
 
 namespace RS3PriceChecker.Repository
 {
@@ -14,11 +12,11 @@ namespace RS3PriceChecker.Repository
 
         List<MostRecentPrices> GetRecentPrices();
 
-        ItemDetail GetItemDetail(int ID);
+        ItemDetails GetItemDetail(int ID);
 
-        ItemDetail CreateItemDetail(ItemDetail request);
+        ItemDetails CreateItemDetail(ItemDetails request);
 
-        ItemDetail UpdateItemDetail(ItemDetail request);
+        ItemDetails UpdateItemDetail(ItemDetails request);
 
         void CreatePrice(Prices prices);
 

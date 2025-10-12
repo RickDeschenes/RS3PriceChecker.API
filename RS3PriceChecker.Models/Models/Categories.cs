@@ -1,15 +1,8 @@
-﻿using RS3PriceChecker.Models.Common;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿
+namespace RS3PriceChecker.Models;
 
-namespace RS3PriceChecker.Models
+public class Categories : BaseModel
 {
-    public class Categories : BaseModel
-    {
-        [Required]
-        public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
-        public IEnumerable<Items> Items { get; set; }
-
-    }
 }

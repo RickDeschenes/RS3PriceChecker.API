@@ -1,7 +1,7 @@
 ﻿
-namespace RS3PriceChecker.Models;
+namespace RS3PriceChecker.Database;
 
-public class MostRecentPrices
+public class MostRecentPrice
 {
     public int IID { get; set; }
     public int ItemID { get; set; }
