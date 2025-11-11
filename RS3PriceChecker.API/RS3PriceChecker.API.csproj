@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CustomLogger\CustomLogger.csproj" />
     <ProjectReference Include="..\RS3PriceChecker.Models\RS3PriceChecker.Models.csproj" />
     <ProjectReference Include="..\RS3PriceChecker.Services\RS3PriceChecker.Services.csproj" />
   </ItemGroup>

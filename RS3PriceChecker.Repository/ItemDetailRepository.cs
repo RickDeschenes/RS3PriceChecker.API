@@ -5,38 +5,13 @@ using RS3PriceChecker.Models;
 
 namespace RS3PriceChecker.Repository;
 
-public class ItemDetailRepository
+public class ItemDetailRepository(RS3DbContext context, IMapper mapper)
 {
-    protected readonly RS3DbContext db;
+    protected readonly RS3DbContext db = context;
 
-    private readonly IMapper _mapper;
+    private readonly IMapper _mapper = mapper;
 
-    public ItemDetailRepository(RS3DbContext context, IMapper mapper)
-    {
-        db = context;
-        _mapper = mapper;
-    }
-
-    #region Update Items
-
-    public string UpdateItems()
-    {
-        return "";
-    }
-
-    #endregion Update Items
-
-    #region Crud Items
-
-    public List<Items> GetAllItems()
-    {
-        return _mapper.Map<List<Item>, List<Items>>([.. db.Item]);
-    }
-
-    public List<Prices> GetAllPricesByItemID(int itemID)
-    {
-        return _mapper.Map<List<Price>, List<Prices>>([.. db.Price.Where(w => w.ItemId == itemID)]);
-    }
+    #region Compound Crud
 
     public List<MostRecentPrices> GetRecentPrices()
     {
@@ -123,14 +98,38 @@ public class ItemDetailRepository
         return GetItemDetail(item?.ItemID ?? 0);
     }
 
-    public ItemDetails UpdateItemDetail(ItemDetails request)
+    public static ItemDetails UpdateItemDetail(ItemDetails request)
     {
-        ItemDetails results = new();
+        // Implementation for updating item details can be added here
 
-        return results;
+        return request;
+
     }
 
-    private void CreatePrices(List<Prices>  rawprices, int iD, string createBy, DateTime date)
+    #endregion Compound Crud
+
+    #region Crud Items
+
+    public List<Prices> GetAllPricesByItemID(int itemId)
+    {
+        return _mapper.Map<List<Price>, List<Prices>>([.. db.Price.Where(w => w.ItemId == itemId)]);
+    }
+
+    public List<Prices> GetAllPrices()
+    {
+        return _mapper.Map<List<Price>, List<Prices>>([.. db.Price]);
+    }
+
+    public Prices CreatePrice(Prices price)
+    {
+        using var transaction = db.Database.BeginTransaction();
+        db.Price.Add(_mapper.Map<Prices, Price>(price));
+        db.SaveChanges();
+        db.Database.CommitTransaction();
+        return GetAllPricesByItemID(price.ItemId).Where(w => w.Date == price.Date).FirstOrDefault() ?? new Prices();
+    }
+
+    public List<Prices> CreatePrices(List<Prices>  rawprices, int iD, string createBy, DateTime date)
     {
         List<Prices> prices = [];
 
@@ -152,15 +151,26 @@ public class ItemDetailRepository
         db.Price.AddRange(_mapper.Map<List<Prices>, List<Price>>(prices));
         db.SaveChanges();
         db.Database.CommitTransaction();
-
+        
+        return prices;
     }
 
-    public void CreatePrice(Prices price)
+    public Prices UpdatePrice(Prices price)
     {
         using var transaction = db.Database.BeginTransaction();
-        db.Price.Add(_mapper.Map<Prices, Price>(price));
+        db.Price.Update(_mapper.Map<Prices, Price>(price));
         db.SaveChanges();
         db.Database.CommitTransaction();
+        return price;
+    }
+
+    public List<Prices> UpdatePrices(List<Prices> prices)
+    {
+        using var transaction = db.Database.BeginTransaction();
+        db.Price.UpdateRange(_mapper.Map<List<Prices>, List<Price>>(prices));
+        db.SaveChanges();
+        db.Database.CommitTransaction();
+        return prices;
     }
 
     public Categories GetCatagoryByID(int ID)
@@ -178,12 +188,48 @@ public class ItemDetailRepository
         return  _mapper.Map<List<Category>, List<Categories>>([.. db.Category.Where(w => !w.Name.StartsWith("Deleted - "))]);
     }
 
-    private Icons GetIcon(string small)
+    public Categories CreateCatagory(Categories catagory)
+    {
+        using var transaction = db.Database.BeginTransaction();
+        db.Category.Add(_mapper.Map<Categories, Category>(catagory));
+        db.SaveChanges();
+        db.Database.CommitTransaction();
+        return GetCatagoryByName(catagory.Name);
+    }
+
+    public List<Categories> CreateCatagories(List<Categories> catagories)
+    {
+        using var transaction = db.Database.BeginTransaction();
+        db.Category.AddRange(_mapper.Map<List<Categories>, List<Category>>(catagories));
+        db.SaveChanges();
+        db.Database.CommitTransaction();
+        return catagories;
+    }
+
+    public Categories UpdateCatagory(Categories catagory)
+    {
+        using var transaction = db.Database.BeginTransaction();
+        db.Category.UpdateRange([_mapper.Map<Categories, Category>(catagory)]);
+        db.SaveChanges();
+        db.Database.CommitTransaction();
+        return catagory;
+    }
+
+    public List<Categories> UpdateCatagories(List<Categories> catagories)
+    {
+        using var transaction = db.Database.BeginTransaction();
+        db.Category.UpdateRange(_mapper.Map<List<Categories>, List<Category>>(catagories));
+        db.SaveChanges();
+        db.Database.CommitTransaction();
+        return catagories;
+    }
+
+    public Icons GetIcon(string small)
     {
         return _mapper.Map<Icon, Icons>(db.Icon.Where(w => w.Small == small).FirstOrDefault() ?? new Icon());
     }
 
-    private Icons CreateIcon(Icons icon)
+    public Icons CreateIcon(Icons icon)
     {
         using var transaction = db.Database.BeginTransaction();
         db.Icon.Add(_mapper.Map<Icons, Icon>(icon));
@@ -193,13 +239,35 @@ public class ItemDetailRepository
         return GetIcon(icon.Small);
     }
 
+    public List<Icons> CreateIcons(List<Icons> icons)
+    {
+        using var transaction = db.Database.BeginTransaction();
+        db.Icon.AddRange(_mapper.Map<List<Icons>, List<Icon>>(icons));
+        db.SaveChanges();
+        db.Database.CommitTransaction();
+        return icons;
+    }
 
-    private Items GetItem(int itemID)
+    public List<Icons> UpdateIcons(List<Icons> icons)
+    {
+        using var transaction = db.Database.BeginTransaction();
+        db.Icon.UpdateRange(_mapper.Map<List<Icons>, List<Icon>>(icons));
+        db.SaveChanges();
+        db.Database.CommitTransaction();
+        return icons;
+    }
+
+    public Items GetItem(int itemID)
     {
         return _mapper.Map<Item, Items>(db.Item.Where(w => w.ItemId == itemID).FirstOrDefault() ?? new());
     }
 
-    private Items CreateItem(Items item)
+    public List<Items> GetAllItems()
+    {
+        return _mapper.Map<List<Item>, List<Items>>([.. db.Item]);
+    }
+
+    public Items CreateItem(Items item)
     {
         using var transaction = db.Database.BeginTransaction();
         db.Item.Add(_mapper.Map<Items, Item>(item));
@@ -209,12 +277,30 @@ public class ItemDetailRepository
         return GetItem(item.ItemID);
     }
 
-    private Names GetName(string value)
+    public List<Items> CreateItems(List<Items> items)
+    {
+        using var transaction = db.Database.BeginTransaction();
+        db.Item.AddRange(_mapper.Map<List<Items>, List<Item>>(items));
+        db.SaveChanges();
+        db.Database.CommitTransaction();
+        return items;
+    }
+
+    public List<Items> UpdateItems(List<Items> items)
+    {
+        using var transaction = db.Database.BeginTransaction();
+        db.Item.UpdateRange(_mapper.Map<List<Items>, List<Item>>(items));
+        db.SaveChanges();
+        db.Database.CommitTransaction();
+        return items;
+    }
+
+    public Names GetName(string value)
     {
         return _mapper.Map<Name, Names>(db.Name.Where(w => w.Value == value).FirstOrDefault() ?? new Name());
     }
 
-    private Names CreateName(Names name)
+    public Names CreateName(Names name)
     {
         using var transaction = db.Database.BeginTransaction();
         db.Name.Add(_mapper.Map<Names, Name>(name));
@@ -222,6 +308,24 @@ public class ItemDetailRepository
         db.Database.CommitTransaction();
 
         return GetName(name.Value);
+    }
+
+    public List<Names> CreateNames(List<Names> names)
+    {
+        using var transaction = db.Database.BeginTransaction();
+        db.Name.AddRange(_mapper.Map<List<Names>, List<Name>>(names));
+        db.SaveChanges();
+        db.Database.CommitTransaction();
+        return names;
+    }
+
+    public List<Names > UpdateNames(List<Names> names)
+    {
+        using var transaction = db.Database.BeginTransaction();
+        db.Name.UpdateRange(_mapper.Map<List<Names>, List<Name>>(names));
+        db.SaveChanges();
+        db.Database.CommitTransaction();
+        return names;
     }
 
     #endregion

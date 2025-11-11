@@ -1,0 +1,5 @@
+Scaffold-DbContext "Data Source=dads-pc;Initial Catalog=RS3PriceChecker;Integrated Security=True;Encrypt=False;Connect Timeout=30;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -ContextDir Context -Context RS3DbContext -Force
+
+Scaffold-DbContext "Data Source=dads-pc;Initial Catalog=RS3PriceChecker;Integrated Security=True;Encrypt=False;Connect Timeout=30;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Entities -ContextDir . -Context RS3DbContext -Force
+
+Scaffold-DbContext "Data Source=dads-pc;Initial Catalog=RS3PriceChecker;Integrated Security=True;Encrypt=False;Connect Timeout=30;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Entities -ContextDir . -Context RS3DbContext -Force -UseDatabaseNames

@@ -28,36 +28,36 @@ namespace RS3PriceChecker.Services
 
         public void UpdateItemDetails()
         {
-            StringBuilder sb = new();
+            //StringBuilder sb = new();
 
-            DateTime ltdate = DateTime.Now.Date.AddDays(-1);
+            //DateTime ltdate = DateTime.Now.Date.AddDays(-1);
 
-            DateTime dbdate = new DateTimeOffset(DateTime.Today).UtcDateTime.Date;
+            //DateTime dbdate = new DateTimeOffset(DateTime.Today).UtcDateTime.Date;
 
-            if (dbdate > ltdate)
-                dbdate = ltdate;
+            //if (dbdate > ltdate)
+            //    dbdate = ltdate;
 
-            var items = _ItemDetailRepository.GetRecentPrices().ToList();
-            items = [.. items.Where(w => w.Date < dbdate)];
+            //var items = _ItemDetailRepository.GetRecentPrices().ToList();
+            //items = [.. items.Where(w => w.Date < dbdate)];
 
-            GrandExchange = new();
+            //GrandExchange = new();
 
-            //foreach (var item in items)
-            for (int i = (items.Count - 1); i >= 0; i--)
-            {
-                var item = items[i];
-                var p = _ItemDetailRepository.GetAllPricesByItemID(item.IID).OrderByDescending(d => d.Date).FirstOrDefault();
-                //If we have prices
-                if (p != null && p.Id> 0)
-                {
-                    //and they are older then one day
-                    if (p.Date < dbdate)
-                    {
-                        // Load the prices
-                        sb.AppendLine(UpdatePrices(item.ItemId, p, p.Date));
-                    }
-                }
-            }
+            ////foreach (var item in items)
+            //for (int i = (items.Count - 1); i >= 0; i--)
+            //{
+            //    var item = items[i];
+            //    var p = _ItemDetailRepository.GetAllPricesByItemID(item.IID).OrderByDescending(d => d.Date).FirstOrDefault();
+            //    //If we have prices
+            //    if (p != null && p.Id> 0)
+            //    {
+            //        //and they are older then one day
+            //        if (p.Date < dbdate)
+            //        {
+            //            // Load the prices
+            //            sb.AppendLine(UpdatePrices(item.ItemId, p, p.Date));
+            //        }
+            //    }
+            //}
             //log the results
             //return sb.ToString();
         }
@@ -173,7 +173,6 @@ namespace RS3PriceChecker.Services
 
             var items = _ItemDetailRepository.GetRecentPrices().ToList();
 
-            GrandExchange = new();
             Random random = new();
             int occurence = 1;
 
@@ -259,7 +258,7 @@ namespace RS3PriceChecker.Services
         public ItemDetails UpdateItemDetail(ItemDetails request)
         {
 
-            return _ItemDetailRepository.UpdateItemDetail(request);
+            return ItemDetailRepository.UpdateItemDetail(request);
         }
 
     }

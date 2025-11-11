@@ -1,7 +1,12 @@
+using CustomLogger;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using RS3PriceChecker.Database;
 using RS3PriceChecker.Repository;
 using RS3PriceChecker.Services;
+using RS3PriceChecker.Services.Factories;
+using System.Data.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,9 +17,38 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Add DbContext with connection string from appsettings.json
-builder.Services.AddDbContext<RS3DbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("Rs3DbContext")));
+//initialize configuration
+var config = builder.Configuration;
+
+// Use a DbContextFactory
+builder.Services.AddDbContextFactory<RS3DbContext>(options =>
+{
+    // get configuration
+    options.UseSqlServer(config["Rs3DbContext"]);
+});
+
+
+// Add CustomLogger factory
+builder.Services.AddSingleton<ICustomLogger>(sp =>
+{
+    var filePath = config["CustomLogging:FilePath"] ?? string.Empty;
+    var fileName = config["CustomLogging:FileName"] ?? string.Empty;
+
+    // Read configured log level and try to parse it into the enum.
+    // If parsing fails or value is missing, default to Info.
+    var tempLevel = config["CustomLogging:LogLevel"];
+    if (string.IsNullOrWhiteSpace(tempLevel))
+    {
+        tempLevel = "Info";
+    }
+
+    if (!Enum.TryParse<CustomLogger.LogLevel>(tempLevel, ignoreCase: true, out var logLevel))
+    {
+        logLevel = CustomLogger.LogLevel.Info;
+    }
+
+    return CustomLogger.LoggerFactory.Create(filePath, fileName, logLevel);
+});
 
 builder.Services.AddTransient<ItemDetailRepository, ItemDetailRepository>();
 
