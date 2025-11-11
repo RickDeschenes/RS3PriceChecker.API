@@ -10,7 +10,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 
-namespace RS3PriceChecker.Services
+namespace RS3PriceChecker.Services.Services
 {
     public class LoadDataService
     {
@@ -25,9 +25,9 @@ namespace RS3PriceChecker.Services
 
         private readonly JsonSerializerOptions Options = new() { PropertyNameCaseInsensitive = true, WriteIndented = true };
 
-        private readonly string[] Categories = { "Miscellaneous", "Ammo", "Arrows", "Bolts", "Construction materials", "Construction products", "Cooking ingredients", "Costumes", "Crafting materials", "Familiars", "Farming produce", "Fletching materials", "Food and Drink", "Herblore materials", "Hunting equipment", "Hunting Produce", "Jewellery", "Mage armour", "Mage weapons", "Melee armour - low level", "Melee armour - mid level", "Melee armour - high level", "Melee weapons - low level", "Melee weapons - mid level", "Melee weapons - high level", "Mining and Smithing", "Potions", "Prayer armour", "Prayer materials", "Range armour", "Range weapons", "Runecrafting", "Runes, Spells and Teleports", "Seeds", "Summoning scrolls", "Tools and containers", "Woodcutting product", "Pocket items", "Stone spirits", "Salvage", "Firemaking products", "Archaeology materials" };
+        private readonly string[] Categories = ["Miscellaneous", "Ammo", "Arrows", "Bolts", "Construction materials", "Construction products", "Cooking ingredients", "Costumes", "Crafting materials", "Familiars", "Farming produce", "Fletching materials", "Food and Drink", "Herblore materials", "Hunting equipment", "Hunting Produce", "Jewellery", "Mage armour", "Mage weapons", "Melee armour - low level", "Melee armour - mid level", "Melee armour - high level", "Melee weapons - low level", "Melee weapons - mid level", "Melee weapons - high level", "Mining and Smithing", "Potions", "Prayer armour", "Prayer materials", "Range armour", "Range weapons", "Runecrafting", "Runes, Spells and Teleports", "Seeds", "Summoning scrolls", "Tools and containers", "Woodcutting product", "Pocket items", "Stone spirits", "Salvage", "Firemaking products", "Archaeology materials"];
 
-        private GrandExchangeService _exchangeService { get; set; }
+        private readonly IGrandExchangeService _exchangeService;
         private readonly ILogger<LoadDataService> _logger;
         private readonly ItemDetailRepository _ItemDetailRepository;
         private readonly ItemDetailService _itemDetailService;
@@ -37,7 +37,7 @@ namespace RS3PriceChecker.Services
         /// </summary>
         /// <param name="logger"></param>
         /// <param name="itemDetailRepository"></param>
-        public LoadDataService(ILogger<LoadDataService> logger, ItemDetailService itemDetailService, ItemDetailRepository itemDetailRepository, GrandExchangeService exchangeService)
+        public LoadDataService(ILogger<LoadDataService> logger, ItemDetailService itemDetailService, ItemDetailRepository itemDetailRepository, IGrandExchangeService exchangeService)
         {
             _logger = logger;
             _itemDetailService = itemDetailService;
@@ -66,7 +66,7 @@ namespace RS3PriceChecker.Services
                     Id = i,
                     Price = new()
                 };
-                var vals = LoadPrice(i, _exchangeService).ToList();
+                var vals = LoadPrice(i).ToList();
                 item.Price = vals.Where(x => x.Date == DateTime.Today || x.Date == DateTime.Today.AddDays(-1)).First().Price;
                 var result = JsonSerializer.Serialize(item, Options);
 
@@ -99,7 +99,7 @@ namespace RS3PriceChecker.Services
 
             for (int i = 0; i < 42; i++)
             {
-                LoadFilters(_exchangeService, i);
+                LoadFilters(i);
             }
 
             watch.Stop();
@@ -110,17 +110,17 @@ namespace RS3PriceChecker.Services
             return string.Format("Processed {0} categories for a total of {1} items in {2} h:mm:ss.", Categories.Length, Items.Count, processTime);
         }
 
-        private void LoadFilters(GrandExchangeService gs, int category)
+        private void LoadFilters(int category)
         {
             string catalog = Categories[category];
             string extention = ".json";
             string raw = string.Empty;
             int attempts = 1;
 
-            while (raw == String.Empty)
+            while (raw == string.Empty)
             { 
-                raw = gs.GetCatalogue(category);
-                if (raw == String.Empty)
+                raw = _exchangeService.GetCatalogue(category);
+                if (raw == string.Empty)
                     Thread.Sleep(SleepSeconds);
                 if (attempts > 5)
                 {
@@ -135,26 +135,28 @@ namespace RS3PriceChecker.Services
             Current++;
 
             var vals = JsonSerializer.Deserialize<FilterValues>(raw, Options);
+            if (vals == null || vals.Alpha == null)
+                return;
 
             foreach (var item in vals.Alpha.Where(w => w.Items > 0 && w.Letter != "#"))
             {
                 string path = Path.Combine(OutputPath, string.Format("{0}_{1}{2}", catalog, item.Letter, extention));
 
                 //if the file exists and delete is on
-                if (System.IO.File.Exists(path) && Delete)
-                    try { System.IO.File.Delete(path); }
+                if (File.Exists(path) && Delete)
+                    try { File.Delete(path); }
                     catch (Exception ex) { _logger.LogError(ex, "{message}.", ex.Message); }
 
                 //reset the items list
                 Items = [];
 
                 //If the file does not exist, process it
-                if (!System.IO.File.Exists(path))
+                if (!File.Exists(path))
                 {
-                    LoadItems(_exchangeService, category, item.Letter, item.Items);
+                    LoadItems(category, item.Letter, item.Items);
                     var output = JsonSerializer.Serialize(Items, Options );
 
-                    System.IO.File.WriteAllText(path, output);
+                    File.WriteAllText(path, output);
                 }
             }
 
@@ -182,7 +184,7 @@ namespace RS3PriceChecker.Services
 
         }
 
-        private string LoadItems(GrandExchangeService gs, int category, string letter, double items)
+        private string LoadItems(int category, string letter, double items)
         {
             if (letter == null || letter.Length != 1)
                 return "";
@@ -198,13 +200,13 @@ namespace RS3PriceChecker.Services
             {
                 int attempts = 1;
                 Thread.Sleep(SleepSeconds);
-                string vals = gs.GetItems(category, letter, page);
+                string vals = _exchangeService.GetItems(category, letter, page);
 
-                while (vals == String.Empty)
+                while (vals == string.Empty)
                 {
                     attempts++;
                     Thread.Sleep(SleepSeconds);
-                    vals = gs.GetItems(category, letter, page);
+                    vals = _exchangeService.GetItems(category, letter, page);
                     if (attempts >= 5 && (string.IsNullOrEmpty(vals) || vals == "null"))
                     {
                         _logger.LogInformation("Processing catagory: {category} letter: {letter} page {page} of {pages} with a ThreadSleep of: {sleep} ms.", category, letter, page, Items.Count, SleepSeconds);
@@ -216,6 +218,8 @@ namespace RS3PriceChecker.Services
                 Current++;
 
                 var data = JsonSerializer.Deserialize<RSRawItems>(vals, Options);
+                if (data == null || data.Items == null || data.Items.Count == 0)
+                    continue;
 
                 data.Items = SetCategory(data.Items, Categories[category]);
 
@@ -252,13 +256,13 @@ namespace RS3PriceChecker.Services
                 int attempts = 1;
                 Thread.Sleep(SleepSeconds);
 
-                var vals = LoadPrice(item.Id, _exchangeService);
+                var vals = LoadPrice(item.Id);
                 attempts = 1;
                 while (vals == null || vals.Count <= 0)
                 {
                     _logger.LogWarning("No Data Returned Catagory:Current {Catagory}:{Current}::{attempts}.", catagory, Current, attempts);
                     Thread.Sleep(SleepSeconds);
-                    vals = LoadPrice(item.Id, _exchangeService);
+                    vals = LoadPrice(item.Id);
                     attempts += 1;
                     if (attempts >= 5 && (vals == null || vals.Count <= 0))
                     {
@@ -275,18 +279,18 @@ namespace RS3PriceChecker.Services
             }
         }
 
-        private static List<RSPrice> LoadPrice(int id, GrandExchangeService gs)
+        private List<RSPrice> LoadPrice(int id)
         {
             List<RSPrice> results = [];
 
-            string vals = gs.GetPrices(id);
+            string vals = _exchangeService.GetPrices(id);
             if (vals == "null" || string.IsNullOrEmpty(vals))
                 return results;
 
             vals = vals.Replace("\"", "");
 
             vals = vals.Replace("{daily:{", "");
-            vals = vals[1..vals.IndexOf("}")];
+            vals = vals[1..vals.IndexOf('}')];
             string[] commas = vals.Split(',');
             foreach (var dates in commas)
             {
@@ -323,11 +327,26 @@ namespace RS3PriceChecker.Services
 
             foreach (var item in list)
             {
-                string data = System.IO.File.ReadAllText(item);
+                if (string.IsNullOrEmpty(item))
+                    continue;
+
+                if (!File.Exists(item))
+                    continue;
+
+                var data = File.ReadAllText(item);
                 var items = JsonSerializer.Deserialize<List<RSItem>>(data, Options);
+                if (items == null || items.Count == 0)
+                    continue;
+
                 ProcessItems(items, _itemDetailService);
-                string name = Path.GetFileName(item);
-                string processed = Path.GetDirectoryName(item);
+                var name = Path.GetFileName(item);
+                if (string.IsNullOrEmpty(name))
+                    continue;
+
+                var processed = Path.GetDirectoryName(item);
+                if (processed == null)
+                    continue;
+
                 processed = Path.Combine(processed, "Processed");
 
                 if (!Directory.Exists(processed))

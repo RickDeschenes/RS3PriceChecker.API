@@ -1,6 +1,16 @@
 ﻿using CustomLogger;
 
-namespace RS3PriceChecker.Services;
+namespace RS3PriceChecker.Services.Services;
+
+public interface IGrandExchangeService
+{
+    string GetDownload(string url = "https://chisel.weirdgloop.org/gazproj/gazbot/rs_dump.json");
+    string GetItems(int category, string startsWith, int page);
+    string GetDetail(int itemID);
+    int GetCatalogueCount();
+    string GetCatalogue(int category);
+    string GetPrices(int itemID);
+}
 
 public class GrandExchangeService(ICustomLogger logger)
 {
@@ -29,6 +39,7 @@ public class GrandExchangeService(ICustomLogger logger)
         }
         catch (Exception e)
         {
+            _logger.Error($"Error getting items: {e.Message}.", e);
             throw new Exception(e.Message);
         }
     }
@@ -42,6 +53,7 @@ public class GrandExchangeService(ICustomLogger logger)
         }
         catch (Exception e)
         {
+            _logger.Error($"Error getting item detail: {e.Message}.", e);
             return e.Message;
         }
     }
@@ -59,6 +71,7 @@ public class GrandExchangeService(ICustomLogger logger)
         }
         catch (Exception e)
         {
+            _logger.Error($"Error getting catalogue count: {e.Message}.", e);
             return results;
         }
         return results;
@@ -74,6 +87,7 @@ public class GrandExchangeService(ICustomLogger logger)
         }
         catch (Exception e)
         {
+            _logger.Error($"Error getting catalogue: {e.Message}.", e);
             return e.Message;
         }
     }
@@ -87,6 +101,7 @@ public class GrandExchangeService(ICustomLogger logger)
         }
         catch (Exception e)
         {
+            _logger.Error($"Error getting prices: {e.Message}.", e);
             return e.Message;
         }
     }

@@ -1,12 +1,9 @@
 using CustomLogger;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using RS3PriceChecker.Database;
 using RS3PriceChecker.Repository;
 using RS3PriceChecker.Services;
-using RS3PriceChecker.Services.Factories;
-using System.Data.Common;
+using RS3PriceChecker.Services.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

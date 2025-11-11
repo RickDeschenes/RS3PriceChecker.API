@@ -1,35 +1,21 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using RS3PriceChecker.Models;
-using RS3PriceChecker.Services;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+using RS3PriceChecker.Services.Services;
 
-namespace RS3PriceChecker.API;
+namespace RS3PriceChecker.API.Controllers;
 
 [Route("api/ItemDetail")]
 [ApiController]
-public class ItemDetailController : ControllerBase
+public class ItemDetailController(ItemDetailService itemDetailService) : ControllerBase
 {
-    private readonly ILogger<ItemDetailController> _logger;
-
-    private readonly ItemDetailService _ItemDetailService;
-
-    public ItemDetailController(ItemDetailService itemDetailService, ILogger<ItemDetailController> logger)
-    {
-        _logger = logger;
-        _ItemDetailService = itemDetailService;
-    }
+    private readonly ItemDetailService _ItemDetailService = itemDetailService;
 
     #region Update GE Item Detailss
 
     [HttpGet("UpdateItemDetails")]
     public void UpdateItemDetails()
     {
-        _ItemDetailService.UpdateItemDetails();
+        ItemDetailService.UpdateItemDetails();
     }
 
     #endregion
@@ -59,7 +45,7 @@ public class ItemDetailController : ControllerBase
     [HttpPost("UpdateItemDetail")]
     public ItemDetails UpdateItemDetail(ItemDetails request)
     {
-        return _ItemDetailService.UpdateItemDetail(request);
+        return ItemDetailService.UpdateItemDetail(request);
     }
 
 }

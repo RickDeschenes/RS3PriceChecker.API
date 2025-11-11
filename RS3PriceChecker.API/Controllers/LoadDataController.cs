@@ -1,32 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using RS3PriceChecker.Database;
-using RS3PriceChecker.Repository;
-using RS3PriceChecker.Services;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
+using RS3PriceChecker.Services.Services;
 
 namespace RS3PriceChecker.API.Controllers
 {
     [ApiController]
     [Route("api/LoadData")]
-    public class LoadDataController : ControllerBase
+    public class LoadDataController(IConfiguration config, ILogger<LoadDataController> logger, LoadDataService loadDataService, IServiceProvider serviceProvider) : ControllerBase
     {
-        private readonly IConfiguration _config;
-        private readonly ILogger<LoadDataController> _logger;
+        private readonly IConfiguration _config = config;
+        private readonly ILogger<LoadDataController> _logger = logger;
 
-        private readonly LoadDataService _LoadDataService;
-        private readonly IServiceProvider ServiceProvider;
-
-        public LoadDataController(IConfiguration config, ILogger<LoadDataController> logger, LoadDataService loadDataService, IServiceProvider serviceProvider) //, IItemDetailRepository item, RS3PriceCheckerDBContext context)
-        {
-            _config = config;
-            _logger = logger;
-            _LoadDataService = loadDataService;
-            ServiceProvider = serviceProvider;
-        }
+        private readonly LoadDataService _LoadDataService = loadDataService;
+        private readonly IServiceProvider ServiceProvider = serviceProvider;
 
         #region Load GE Item Details
 
@@ -42,7 +27,7 @@ namespace RS3PriceChecker.API.Controllers
         public void LoadAllGEItems()
         {
             _logger.LogInformation("Processing LoadAllGEItems");
-            string outputPath = _config.GetValue<string>("AppSettings:OutputPath");
+            string outputPath = _config.GetValue<string>("AppSettings:OutputPath") ?? string.Empty;
 
             Task.Run(() => _LoadDataService.LoadAllGEItems(outputPath));
             _logger.LogInformation("Processed LoadAllGEItems");

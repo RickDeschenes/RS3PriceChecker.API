@@ -1,25 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using RS3PriceChecker.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using RS3PriceChecker.Services.Services;
 
 namespace RS3PriceChecker.API.Controllers
 {
     [ApiController]
     [Route("api/GrandExchange")]
-    public class GrandExchangeController : ControllerBase
+    public class GrandExchangeController(GrandExchangeService grandExchangeService) : ControllerBase
     {
-        private readonly ILogger<GrandExchangeController> _logger;
-        private readonly GrandExchangeService _GrandExchangeService;
-
-        public GrandExchangeController(ILogger<GrandExchangeController> logger, GrandExchangeService grandExchangeService)
-        {
-            _logger = logger;
-            _GrandExchangeService = grandExchangeService;
-        }
+        private readonly GrandExchangeService _service = grandExchangeService;
 
         /// <summary>
         /// Retrieves items from the RS item database that match your search.
@@ -31,8 +19,7 @@ namespace RS3PriceChecker.API.Controllers
         [HttpGet("GetGEItems")]
         public string GetGEItems(int category, string startsWith, int page)
         {
-            _logger.LogInformation("Call to GetGEItems category:{category}, startsWith:{startsWith}, page:{page}.", category, startsWith, page);
-            return _GrandExchangeService.GetItems(category, startsWith, page);
+            return _service.GetItems(category, startsWith, page);
         }
 
         /// <summary>
@@ -45,7 +32,6 @@ namespace RS3PriceChecker.API.Controllers
         [HttpGet("GetGEItemsAsync")]
         public async Task<string> GetGEItemsAsync(int category, string startsWith, int page)
         {
-            _logger.LogInformation("Call to GetGEItems {category}, startsWith:{startsWith}, page:{page}.", category, startsWith, page);
             Func<string> asyncFunc = new(() => GetGEItems(category, startsWith, page));
             return await Task.Run(asyncFunc);
         }
@@ -58,8 +44,7 @@ namespace RS3PriceChecker.API.Controllers
         [HttpGet("GetGEItemDetail")]
         public string GetGEItemDetail(int itemID)
         {
-            _logger.LogInformation("Call to GetGEItemDetail itemID:{itemID}.", itemID);
-            return _GrandExchangeService.GetDetail(itemID);
+            return _service.GetDetail(itemID);
         }
 
         /// <summary>
@@ -69,8 +54,7 @@ namespace RS3PriceChecker.API.Controllers
         [HttpGet("GetCatalogueCount")]
         public int GetCatalogueCount()
         {
-            _logger.LogInformation("Call to Get Catalogue count.");
-            return _GrandExchangeService.GetCatalogueCount();
+            return _service.GetCatalogueCount();
         }
 
         /// <summary>
@@ -81,8 +65,7 @@ namespace RS3PriceChecker.API.Controllers
         [HttpGet("GetGECatalogue")]
         public string GetGECatalogue(int ID)
         {
-            _logger.LogInformation("Call to GetGECatalogue ID:{ID}.", ID);
-            return _GrandExchangeService.GetCatalogue(ID);
+            return _service.GetCatalogue(ID);
         }
 
         /// <summary>
@@ -93,7 +76,6 @@ namespace RS3PriceChecker.API.Controllers
         [HttpGet("GetGECatalogueAsync")]
         public async Task<string> GetGECatalogueAsync(int ID)
         {
-            _logger.LogInformation("Call to GetGECatalogueAsync ID:{ID}.", ID);
             return await Task.Run<string>(() => GetGECatalogue(ID));
         }
 
@@ -105,8 +87,7 @@ namespace RS3PriceChecker.API.Controllers
         [HttpGet("GetGEPrices")]
         public string GetGEPrices(int ID)
         {
-            _logger.LogInformation("Call to GetGECatalogue category:{ID}.", ID);
-            return _GrandExchangeService.GetPrices(ID);
+            return _service.GetPrices(ID);
         }
 
         /// <summary>
@@ -117,7 +98,6 @@ namespace RS3PriceChecker.API.Controllers
         [HttpGet("GetGEPricesAsync")]
         public async Task<string> GetGEPricesAsync(int itemId)
         {
-            _logger.LogInformation("Call to GetGEPricesAsync ID:{itemId}.", itemId);
             return await Task.Run<string>(() => GetGEPrices(itemId));
         }
     }
